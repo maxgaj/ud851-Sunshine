@@ -22,6 +22,9 @@ import android.widget.TextView;
 
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.utilities.NetworkUtils;
+import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -69,23 +72,35 @@ public class MainActivity extends AppCompatActivity {
     // COMPLETED (5) Create a class that extends AsyncTask to perform network requests
     // COMPLETED (6) Override the doInBackground method to perform your network requests
     // COMPLETED (7) Override the onPostExecute method to display the results of the network request
-    public class FetchWeatherTask extends AsyncTask<URL, Void, String>{
+    public class FetchWeatherTask extends AsyncTask<URL, Void, String[]>{
         @Override
-        protected String doInBackground(URL... urls) {
-            URL searchUrl = urls[0];
-            String weatherSearchResults = null;
-            try {
-                weatherSearchResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
-            } catch (IOException e){
-                e.printStackTrace();
+        protected String[] doInBackground(URL... urls) {
+            // CORRECTION - Add validation
+            if (urls.length == 0){
+                return null;
+            } else {
+                URL searchUrl = urls[0];
+                // CORRECTION - Parse JSON
+                String jsonWeatherSearchResults = null;
+                String[] weatherSearchResults = null;
+                try {
+                    jsonWeatherSearchResults = NetworkUtils.getResponseFromHttpUrl(searchUrl);
+                    weatherSearchResults = OpenWeatherJsonUtils.getOpenWeatherStringsFromJson(MainActivity.this, jsonWeatherSearchResults);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return weatherSearchResults;
             }
-            return weatherSearchResults;
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(String[] s) {
             if (s != null && !s.equals("")){
-                mWeatherTextView.setText(s);
+                // CORRECTION - Parse JSON
+                for (String weatherString : s){
+                    mWeatherTextView.append(weatherString + "\n\n\n");
+                }
+
             }
         }
     }

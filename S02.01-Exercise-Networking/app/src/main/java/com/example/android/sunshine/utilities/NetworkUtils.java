@@ -16,6 +16,7 @@
 package com.example.android.sunshine.utilities;
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ public final class NetworkUtils {
     private static final String STATIC_WEATHER_URL =
             "https://andfun-weather.udacity.com/staticweather";
 
-    private static final String FORECAST_BASE_URL = STATIC_WEATHER_URL;
+    private static final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/weather";
 
     /*
      * NOTE: These values only effect responses from OpenWeatherMap, NOT from the fake weather
@@ -52,6 +53,7 @@ public final class NetworkUtils {
     private static final String units = "metric";
     /* The number of days we want our API to return */
     private static final int numDays = 14;
+    private static final String appId = "f42fb50148a91c590d8c4413e2393f76";
 
     final static String QUERY_PARAM = "q";
     final static String LAT_PARAM = "lat";
@@ -59,6 +61,7 @@ public final class NetworkUtils {
     final static String FORMAT_PARAM = "mode";
     final static String UNITS_PARAM = "units";
     final static String DAYS_PARAM = "cnt";
+    final static String APP_ID = "appid";
 
     /**
      * Builds the URL used to talk to the weather server using a location. This location is based
@@ -69,7 +72,12 @@ public final class NetworkUtils {
      */
     public static URL buildUrl(String locationQuery) {
         // COMPLETED (1) Fix this method to return the URL used to query Open Weather Map's API
-        Uri builtUri = Uri.parse(DYNAMIC_WEATHER_URL).buildUpon()
+        Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                .appendQueryParameter(QUERY_PARAM, locationQuery)
+                .appendQueryParameter(APP_ID, appId)
+                .appendQueryParameter(FORMAT_PARAM, format)
+                .appendQueryParameter(UNITS_PARAM, units)
+                .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                 .build();
         URL url = null;
         try{
@@ -77,6 +85,7 @@ public final class NetworkUtils {
         } catch (MalformedURLException e){
             e.printStackTrace();
         }
+        Log.v(TAG, "Built URI " + url);
         return url;
     }
 

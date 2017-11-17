@@ -29,6 +29,41 @@ import java.net.HttpURLConnection;
  */
 public final class OpenWeatherJsonUtils {
 
+    // basic parsing to test API
+    public static String[] getOpenWeatherStringsFromJson(Context context, String forecastJsonStr) throws JSONException{
+        final String OWM_MESSAGE_CODE = "cod";
+
+        String[] parsedWeatherData = null;
+
+        JSONObject forecastJson = new JSONObject(forecastJsonStr);
+
+        if (forecastJson.has(OWM_MESSAGE_CODE)) {
+            int errorCode = forecastJson.getInt(OWM_MESSAGE_CODE);
+
+            switch (errorCode) {
+                case HttpURLConnection.HTTP_OK:
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    /* Location invalid */
+                    return null;
+                default:
+                    /* Server probably down */
+                    return null;
+            }
+        }
+
+        String name = forecastJson.getString("name");
+        JSONObject mainObject = forecastJson.getJSONObject("main");
+        String temp = mainObject.getString("temp");
+        String humidity = mainObject.getString("humidity");
+        parsedWeatherData = new String[3];
+        parsedWeatherData[0] = "City: " + name;
+        parsedWeatherData[1] = "Temperature: " + temp;
+        parsedWeatherData[2] = "Humidity: " + humidity;
+
+        return parsedWeatherData;
+    }
+
     /**
      * This method parses JSON from a web response and returns an array of Strings
      * describing the weather over various days from the forecast.
