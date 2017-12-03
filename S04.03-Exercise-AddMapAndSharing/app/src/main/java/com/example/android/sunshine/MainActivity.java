@@ -221,7 +221,23 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
             return true;
         }
 
-        // TODO (2) Launch the map when the map menu item is clicked
+        // COMPLETED (2) Launch the map when the map menu item is clicked
+        if (id == R.id.action_map) {
+            String queryKeyString = "q";
+            String queryValueString = "Google, Chaussée d'Etterbeek 180, 1040 Bruxelles";
+
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("geo")
+                    .path("0,0")
+                    .appendQueryParameter(queryKeyString, queryValueString);
+            Uri uri = builder.build();
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(uri);
+
+            if (intent.resolveActivity(getPackageManager())!=null)
+                startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }
