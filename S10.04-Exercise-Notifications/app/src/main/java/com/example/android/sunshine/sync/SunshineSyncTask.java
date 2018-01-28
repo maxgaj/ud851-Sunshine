@@ -18,9 +18,14 @@ package com.example.android.sunshine.sync;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
+import com.example.android.sunshine.R;
+import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.NetworkUtils;
+import com.example.android.sunshine.utilities.NotificationUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
@@ -73,11 +78,24 @@ public class SunshineSyncTask {
                         WeatherContract.WeatherEntry.CONTENT_URI,
                         weatherValues);
 
-//              TODO (13) Check if notifications are enabled
+//              COMPLETED (13) Check if notifications are enabled
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                String key = context.getString(R.string.pref_enable_notifications_key);
+                boolean notificationDefault = context.getResources().getBoolean(R.bool.default_notifications);
+                boolean notificationEnabled = sharedPreferences.getBoolean(key, notificationDefault);
 
-//              TODO (14) Check if a day has passed since the last notification
+//              COMPLETED (14) Check if a day has passed since the last notification
+                String lastNotifKey = context.getString(R.string.pref_last_notification);
+                long lastNotif = sharedPreferences.getLong(lastNotifKey, 0);
+                long currentTime = System.currentTimeMillis();
+                long day = (long) 1000*60*60*24;
 
-//              TODO (15) If more than a day have passed and notifications are enabled, notify the user
+
+
+//              COMPLETED (15) If more than a day have passed and notifications are enabled, notify the user
+                if ((currentTime-lastNotif)>day){
+                    NotificationUtils.notifyUserOfNewWeather(context);
+                }
 
             /* If the code reaches this point, we have successfully performed our sync */
 
